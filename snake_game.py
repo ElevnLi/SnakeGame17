@@ -119,7 +119,47 @@ class Snake:
             elif index == 0:
                 canva.blit(self.tail_graphic, block_rect)
             else:
-                pygame.draw.rect(canva, COLOUR_SNAKE, block_rect)
+                prev_block = self.body[index - 1] - block
+                next_block = self.body[index + 1] - block
+                if prev_block.x == next_block.x:
+                    canva.blit(body_vertical_graphic, block_rect)
+                elif prev_block.y == next_block.y:
+                    canva.blit(body_horizontal_graphic, block_rect)
+                else:
+                    # bl
+                    if (
+                        prev_block.x == -1
+                        and next_block.y == 1
+                        or next_block.x == -1
+                        and prev_block.y == 1
+                    ):
+                        canva.blit(body_bl_graphic, block_rect)
+                    # br
+                    elif (
+                        prev_block.x == 1
+                        and next_block.y == 1
+                        or next_block.x == 1
+                        and prev_block.y == 1
+                    ):
+                        canva.blit(body_br_graphic, block_rect)
+                    # tl
+                    elif (
+                        prev_block.x == -1
+                        and next_block.y == -1
+                        or next_block.x == -1
+                        and prev_block.y == -1
+                    ):
+                        canva.blit(body_tl_graphic, block_rect)
+                    # tr
+                    elif (
+                        prev_block.x == 1
+                        and next_block.y == -1
+                        or next_block.x == 1
+                        and prev_block.y == -1
+                    ):
+                        canva.blit(body_tr_graphic, block_rect)
+                    else:
+                        pygame.draw.rect(canva, COLOUR_SNAKE, block_rect)
 
     @property
     def head(self):
