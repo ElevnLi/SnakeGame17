@@ -14,6 +14,10 @@ COLOUR_SNAKE = (126, 166, 114)
 MAX_FPS = 60
 CELL_SIZE, CELL_NUMBER = 40, 20
 
+LEFT = Vector2(-1, 0)
+RIGHT = Vector2(1, 0)
+UP = Vector2(0, -1)
+DOWN = Vector2(0, 1)
 
 package_base_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -98,19 +102,32 @@ class Fruit:
 class Snake:
     def __init__(self):
         self.body: List[Vector2] = [Vector2(5, 10), Vector2(6, 10), Vector2(7, 10)]
-        self.direction: Vector2 = Vector2(1, 0)
+        self.direction: Vector2 = RIGHT
         self.add_body = False
+        self.head_graphic = head_right_graphic
+        self.tail_graphic = tail_left_graphic
 
     def draw(self):
-        for block in self.body:
+        self.update_head_graphic()
+        self.update_tail_graphic()
+        for index, block in enumerate(self.body):
             block_rect = pygame.Rect(
                 block.x * CELL_SIZE, block.y * CELL_SIZE, CELL_SIZE, CELL_SIZE
             )
-            pygame.draw.rect(canva, COLOUR_SNAKE, block_rect)
+            if index == len(self.body) - 1:
+                canva.blit(self.head_graphic, block_rect)
+            elif index == 0:
+                canva.blit(self.tail_graphic, block_rect)
+            else:
+                pygame.draw.rect(canva, COLOUR_SNAKE, block_rect)
 
     @property
     def head(self):
         return self.body[-1]
+
+    @property
+    def tail(self):
+        return self.body[0]
 
     def move(self):
         current_head = self.head
@@ -125,6 +142,28 @@ class Snake:
 
     def grow(self):
         self.add_body = True
+
+    def update_head_graphic(self):
+        head_direction = self.head - self.body[-2]
+        if head_direction == RIGHT:
+            self.head_graphic = head_right_graphic
+        elif head_direction == LEFT:
+            self.head_graphic = head_left_graphic
+        elif head_direction == UP:
+            self.head_graphic = head_up_graphic
+        elif head_direction == DOWN:
+            self.head_graphic = head_down_graphic
+
+    def update_tail_graphic(self):
+        tail_direction = self.tail - self.body[1]
+        if tail_direction == RIGHT:
+            self.tail_graphic = tail_right_graphic
+        elif tail_direction == LEFT:
+            self.tail_graphic = tail_left_graphic
+        elif tail_direction == UP:
+            self.tail_graphic = tail_up_graphic
+        elif tail_direction == DOWN:
+            self.tail_graphic = tail_down_graphic
 
 
 class SnakeGame:
@@ -178,17 +217,17 @@ while True:
             snake_game.update()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                if snake_game.snake.direction != Vector2(1, 0):
-                    snake_game.snake.direction = Vector2(-1, 0)
+                if snake_game.snake.direction != RIGHT:
+                    snake_game.snake.direction = LEFT
             elif event.key == pygame.K_RIGHT:
-                if snake_game.snake.direction != Vector2(-1, 0):
-                    snake_game.snake.direction = Vector2(1, 0)
+                if snake_game.snake.direction != LEFT:
+                    snake_game.snake.direction = RIGHT
             elif event.key == pygame.K_UP:
-                if snake_game.snake.direction != Vector2(0, 1):
-                    snake_game.snake.direction = Vector2(0, -1)
+                if snake_game.snake.direction != DOWN:
+                    snake_game.snake.direction = UP
             elif event.key == pygame.K_DOWN:
-                if snake_game.snake.direction != Vector2(0, -1):
-                    snake_game.snake.direction = Vector2(0, 1)
+                if snake_game.snake.direction != UP:
+                    snake_game.snake.direction = DOWN
 
     # 渲染
     canva.fill(COLOUR_BG)
